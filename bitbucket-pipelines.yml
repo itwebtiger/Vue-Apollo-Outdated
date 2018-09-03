@@ -1,0 +1,40 @@
+image: node:6.9.4
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - node
+        script:
+          - apt-get update && apt-get install -y python-dev
+          - curl -O https://bootstrap.pypa.io/get-pip.py
+          - python get-pip.py
+          - pip install awscli
+          - node -v
+          - npm install
+          - npm test
+          - npm run build-test
+          - aws s3 sync --delete dist s3://staging.outside.fyi
+  branches:
+    staging:
+      - step:
+          script:
+            - apt-get update && apt-get install -y python-dev
+            - curl -O https://bootstrap.pypa.io/get-pip.py
+            - python get-pip.py
+            - pip install awscli
+            - npm install
+            - npm test
+            - npm run build-test
+            - aws s3 sync --delete dist s3://staging.outside.fyi
+    production:
+      - step:
+          script:
+            - apt-get update && apt-get install -y python-dev
+            - curl -O https://bootstrap.pypa.io/get-pip.py
+            - python get-pip.py
+            - pip install awscli
+            - npm install
+            - npm test
+            - npm run build
+            - aws s3 sync --delete dist s3://www.outside.fyi
